@@ -29,7 +29,7 @@ public:
 
     virtual void draw();
     void handleEvents(const char* const &event);
-    void handleMouse(int x, int y, int button);
+    bool handleMouse(int x, int y, int button);
 
     static void borderBox(int w, int h, int px, int py);
     static void selectBox(int w, int px, int py, bool selected);
@@ -79,6 +79,15 @@ private:
     static unsigned int getBarColor(int p);
 
     int getBlockSize();
+    bool handleMouseVolumeBarScroll(
+        PaObject* item,
+        int mousex,
+        int mousey,
+        int w,
+        int h,
+        int x,
+        int y,
+        int dir);
     bool handleMouseVolumeBar(
         PaObject* item,
         int mousex,

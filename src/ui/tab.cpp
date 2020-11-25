@@ -376,10 +376,10 @@ void Tab::handleEvents(const char* const &event)
     }
 }
 
-void Tab::handleMouse(int x, int y, int button)
+bool Tab::handleMouse(int x, int y, int button)
 {
     if (object == nullptr) {
-        return;
+        return false;
     }
 
     int baseY = 0;
@@ -408,13 +408,20 @@ void Tab::handleMouse(int x, int y, int button)
         blocks_drawn++;
 
         if (has_volume) {
-            if (handleMouseVolumeBar(item, x, y, ui.width, ui.height, 0, baseY + 3)) {
-                return;
+            if (button == 4 || button == 5) {
+                if (handleMouseVolumeBarScroll(item, x, y, ui.width, ui.height, 0, baseY + 3, button == 4 ? 1 : -1)) {
+                    return true;
+                }
+            }
+            else {
+                if (handleMouseVolumeBar(item, x, y, ui.width, ui.height, 0, baseY + 3)) {
+                    return true;
+                }
             }
         } else { // Configuration
             if (item->active_attribute != nullptr) {
                 if (handleMouseDropDown(item, x, y, ui.width - 2, 2, 1, baseY + 2)) {
-                    return;
+                    return true;
                 }
             }
         }
@@ -460,7 +467,7 @@ void Tab::handleMouse(int x, int y, int button)
             selected_block = save_selected_block;
 
             if (done) {
-                return;
+                return true;
             }
 
             toggle_len += item_len;
@@ -472,15 +479,17 @@ void Tab::handleMouse(int x, int y, int button)
 
     if (more_up) {
         if (handleMouseMoreUp(x, y, 4, 1, (ui.width / 2) - 4, 0)) {
-            return;
+            return true;
         }
     }
 
     if (more_down) {
         if (handleMouseMoreDown(x, y, 4, 1, (ui.width / 2) - 4, ui.height - 2)) {
-            return;
+            return true;
         }
     }
+
+    return false;
 }
 
 void Tab::handleDropDown(PaObject* selected_pobj)
@@ -535,6 +544,25 @@ void Tab::handleDropDown(PaObject* selected_pobj)
             );
         }
     }
+}
+
+bool Tab::handleMouseVolumeBarScroll(
+    PaObject* item,
+    int mousex,
+    int mousey,
+    int w,
+    int h,
+    int x,
+    int y,
+    int dir
+)
+{
+    if (mousex < x || mousex >= x + w || mousey < (y - 1) || mousey >= y + 2) {
+        return false;
+    }
+
+    item->step_volume(dir);
+    return true;
 }
 
 bool Tab::handleMouseVolumeBar(

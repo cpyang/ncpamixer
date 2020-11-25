@@ -272,10 +272,10 @@ void Ui::handleInput()
                     }
 //#if NCURSES_MOUSE_VERSION > 1
                 } else if (mevent.bstate & BUTTON4_PRESSED) {
-                    switchTab(++tab_index);
+                    switchTab(--tab_index);
                     return;
                 } else if (mevent.bstate & BUTTON5_PRESSED) {
-                    switchTab(--tab_index);
+                    switchTab(++tab_index);
                     return;
 //#endif
                 }
@@ -292,7 +292,14 @@ void Ui::handleInput()
                 }
 #endif
 
-                current_tab->handleMouse(mevent.x, mevent.y, button);
+                bool clicked = current_tab->handleMouse(mevent.x, mevent.y, button);
+                if (!clicked) {
+                    if (mevent.bstate & BUTTON4_PRESSED) {
+                        switchTab(--tab_index);
+                    } else if (mevent.bstate & BUTTON5_PRESSED) {
+                        switchTab(++tab_index);
+                    }
+                }
             }
 
             return;
